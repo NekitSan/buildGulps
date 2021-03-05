@@ -23,5 +23,8 @@
     "gulp-uglify-es": "^2.0.0",
     "imagemin-jpeg-recompress": "^7.0.0"
   },
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "jsonfile": "^6.1.0"
+  }
 }

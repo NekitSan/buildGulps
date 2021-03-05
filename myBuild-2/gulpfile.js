@@ -14,7 +14,6 @@ const imageminJPG  = require('imagemin-jpeg-recompress'); // compressor
 const del          = require('del');
 const fileinclude  = require('gulp-file-include');
 
-
 function browsersync()
 {
     browserSync.init({
@@ -29,8 +28,7 @@ function html()
 {
     return src([
         'app/*.html',
-        "!app/_*.html",
-        "!app/adminpanel/*.html"
+        "!app/_*.html"
     ])
     .pipe(fileinclude())
     .pipe(dest(dist))
@@ -41,8 +39,7 @@ function html()
 function scripts()
 {
     return src([
-        'app/scripts/app.js',
-        "!app/adminpanel/*.js"
+        'app/scripts/app.js'
     ])
     .pipe(fileinclude())
     .pipe(dest(dist + 'scripts/'))
@@ -55,8 +52,7 @@ function scripts()
 function styles()
 {
     return src([
-        'app/' + preprocessor + '/index.' + preprocessor + '',
-        "!app/adminpanel/*.sass"
+        'app/' + preprocessor + '/index.' + preprocessor + ''
     ])
     .pipe(fileinclude())
     .pipe(eval(preprocessor)())
@@ -105,10 +101,14 @@ function adminPanel()
 {
     // v_0.0.1
     return src([
-        'app/adminpanel/temp.json'
+        'app/adminpanel/index.html',
+        'app/adminpanel/index.css',
+        'app/adminpanel/index.js',
+        'app/adminpanel/temp.json',
     ])
-    .pipe(dest(dist + 'scripts/data.json'))
+    .pipe(dest(dist + "/adminpanel/"))
     .pipe(browserSync.stream());
+    // .pipe(dest(dist + 'scripts/data.json'))
 }
 
 function cleanimg()
@@ -131,11 +131,11 @@ function startwatch()
     ], scripts);
     watch( 'app/images/**/*.{png,jpg,svg}', images);
     watch( 'app/*.md', addReadMe );
+    watch( 'app/adminpanel/*', adminPanel );
 }
 
-let admin           = parallel( adminPanel );
 let build           = series(cleandist, cleanimg, parallel(styles, scripts, html, images, addReadMe));
-let watched         = parallel(build, browsersync, startwatch);
+let watched         = parallel(build, adminPanel, browsersync, startwatch);
 
 exports.browsersync = browsersync;
 exports.html        = html;
@@ -149,6 +149,5 @@ exports.addReadMe   = addReadMe;
 //json admin panel
 exports.adminPanel   = adminPanel;
 
-exports.admin       = admin;
 exports.bild        = build;
 exports.default     = watched;
