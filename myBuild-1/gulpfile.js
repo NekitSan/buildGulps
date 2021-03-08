@@ -1,26 +1,30 @@
 let preprocessor = 'sass';
-const dist = 'project/';
+const dist = require("path").basename(__dirname) + '/';
 
 const { src, dest, parallel, series, watch } = require('gulp');
 
 const browserSync  = require('browser-sync').create();
 const concat       = require('gulp-concat');
 const uglify       = require('gulp-uglify-es').default; // compressor js
-const sass         = require('gulp-sass');
 const autoprefixer = require('gulp-autoprefixer');
+const sass         = require('gulp-sass');
+const less         = require('gulp-less'); 
 const cleancss     = require('gulp-clean-css'); // compressor
 const imagemin     = require('gulp-imagemin'); // compressor
 const imageminJPG  = require('imagemin-jpeg-recompress'); // compressor
-const del          = require('del');
 const fileinclude  = require('gulp-file-include');
-
+const del          = require('del');
+const webp         = require('gulp-webp');
+const webpHTML     = require('gulp-webp-html');
+const webpCSS      = require('gulp-webpcss');
 
 function browsersync()
 {
     browserSync.init({
         server: { baseDir: dist },
-        tunnel: "test",
-        notify: false,
+        // tunnel: "test",
+        port: 3000,
+        notify: false, //false
         online: true //по локалке
     });
 }
@@ -29,9 +33,10 @@ function html()
 {
     return src([
         'app/*.html',
-        "!app/_*.html"
+        "!app/**/_*.html"
     ])
     .pipe(fileinclude())
+    .pipe(webpHTML())
     .pipe(dest(dist))
     .pipe(browserSync.stream());
 }
@@ -40,7 +45,7 @@ function html()
 function scripts()
 {
     return src([
-        'app/scripts/app.js'
+        'app/scripts/*.js'
     ])
     .pipe(fileinclude())
     .pipe(dest(dist + 'scripts/'))
@@ -57,11 +62,17 @@ function styles()
     ])
     .pipe(fileinclude())
     .pipe(eval(preprocessor)())
-    .pipe(dest(dist + 'style/'))
-    .pipe(concat('index.min.css'))
     .pipe(autoprefixer({
         overrideBrowserslist: ['last 10 versions'], grid: true
     }))
+    .pipe(
+        webpCSS({
+            webpClass: '.webp',
+            noWebpClass: '.no-webp'
+        })
+    )
+    .pipe(dest(dist + 'style/'))
+    .pipe(concat('index.min.css'))
     .pipe(cleancss(( { level: { 1: { specialComments: 0 } }/*, format: 'beautify'*/ } )))
     .pipe(dest(dist + 'style/'))
     .pipe(browserSync.stream());
@@ -86,21 +97,19 @@ function images()
             ]
         })
     ]))
+    .pipe(dest(dist + 'images/'))
+    .pipe(
+        webp({
+            quality: 80
+        })
+    )
     .pipe(dest(dist + 'images/'));
 }
 
-function addReadMe()
+function gitReadMe()
 {
-    return src([
-        'app/README.md'
-    ])
-    .pipe(dest(dist))
-    .pipe(browserSync.stream());
-}
-
-function cleanimg()
-{
-    return del('app/images/**/*', { force: true });
+    return src('app/ReadMe.md')
+    .pipe(dest(dist));
 }
 
 function cleandist()
@@ -110,27 +119,25 @@ function cleandist()
 
 function startwatch()
 {
-    watch(["app/**/*.html"], html);
     watch( 'app/**/' + preprocessor + '/**/*', styles);
     watch([
         'app/**/*.js',
         '!app/**/*.min.js'
     ], scripts);
-    watch( 'app/images/**/*.{png,jpg,svg}', images);
-    watch( 'app/*.md', addReadMe );
+    watch('app/**/*.html', html);
+    watch( 'app/images/**/*.{jpg,png,svg,gif,ico,webp}', images);
 }
 
-let build           = series(cleandist, cleanimg, parallel(styles, scripts, html, images, addReadMe));
-let watched         = parallel(build, browsersync, startwatch);
+let build           = series(cleandist, parallel(styles, scripts, html), images, gitReadMe);
+let watched         = parallel(build, startwatch, browsersync);
 
 exports.browsersync = browsersync;
 exports.html        = html;
 exports.scripts     = scripts;
 exports.styles      = styles;
 exports.images      = images;
-exports.cleanimg    = cleanimg;
 exports.cleandist   = cleandist;
-exports.addReadMe   = addReadMe;
+exports.gitReadMe   = gitReadMe;
 
-exports.bild        = build;
+exports.build       = build;
 exports.default     = watched;

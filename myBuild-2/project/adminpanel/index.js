@@ -24,9 +24,34 @@
 //     }
 // }
 
-const jsonfile = require('jsonfile')
-const file = 'temp.json'
-jsonfile.readFile(file, function (err, obj) {
-  if (err) console.error(err)
-  console.dir(obj['key'])
-})
+const file = 'temp.json';
+const jsonfile = require('jsonfile');
+
+// writeJson();
+
+function writeJson() {
+  let obj = {
+    "key": {
+      "articles": [
+        jsonfile.readFile(file, function (err, tempObj) {
+          if (err) console.error(err);
+          console.dir(tempObj['key']['articles']);
+          return tempObj['key']['articles'];
+        }),
+        {
+          "id": 2,
+          "title": 0,
+          "text": 0,
+          "tags": 0,
+          "datatime": ["20.02.2020", "20:20"]
+        }
+      ]
+    }
+  };
+
+  console.dir(obj);
+
+  jsonfile.writeFile(file, obj, function (err) {
+    if (err) console.error(err);
+  });
+}

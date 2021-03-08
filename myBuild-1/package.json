@@ -1,5 +1,5 @@
 {
-  "name": "",
+  "name": "dubclub.git",
   "version": "1.0.0",
   "main": "gulpfile.js",
   "scripts": {
@@ -21,7 +21,19 @@
     "gulp-newer": "^1.4.0",
     "gulp-sass": "^4.1.0",
     "gulp-uglify-es": "^2.0.0",
-    "imagemin-jpeg-recompress": "^7.0.0"
+    "gulp-webp": "^4.0.1",
+    "gulp-webp-html": "^1.0.2",
+    "gulp-webpcss": "^1.1.1",
+    "imagemin-jpeg-recompress": "^7.0.0",
+    "webp-converter": "^2.2.3"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NekitSan/dubclub.git"
+  },
+  "bugs": {
+    "url": "https://github.com/NekitSan/dubclub/issues"
+  },
+  "homepage": "https://github.com/NekitSan/dubclub#readme",
   "description": ""
 }
