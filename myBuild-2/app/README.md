@@ -1,2 +1,0 @@
-# nekitsan.github.io/dubclub
-#
