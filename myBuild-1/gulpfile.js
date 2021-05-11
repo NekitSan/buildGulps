@@ -35,7 +35,10 @@ function html()
         'app/*.html',
         "!app/**/_*.html"
     ])
-    .pipe(fileinclude())
+    .pipe(fileinclude({
+        prefix: '@@',
+        basepath: '@file'
+    }))
     .pipe(webpHTML())
     .pipe(dest(dist))
     .pipe(browserSync.stream());
