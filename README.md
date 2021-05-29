@@ -3,6 +3,6 @@
 - (en) Here are my Gulp assemblies, as well as strangers
 ____
 > myBuild_1 - works great
- - Пока что неизлечимая проблема, пишет ошибку при запуске gulp, помогает "  npm install webp-converter@2.2.3 --save-dev "
+ - если не запускается, то пишем сначала npm audit fix, затем npm fund
 ____
 > myBuild_2 - in developing..
